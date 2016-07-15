@@ -6,7 +6,6 @@ from datetime import timedelta
 from string import Template as tpl
 
 import discogs_client
-from discogs_client import exceptions
 from hsaudiotag import auto as hs
 
 logging.basicConfig(format='%(asctime)-15s %(filename)s %(levelname)s %(message)s', level=logging.INFO)
@@ -59,10 +58,15 @@ except (IndexError, discogs_client.exceptions.HTTPError):
 
 with file('default.tpl', 'r') as _file:
     _template = tpl(_file.read())
-    print _template.substitute({'artist': artist or "none",
-                                'album': title or 'none',
-                                'genre': genre or 'none',
-                                'style': style or 'none',
-                                'bitrate': _bitrate or 'none',
-                                'bitrate_literal': _bitrate_literal or 'none',
-                                'tracklist': '\n'.join(_tracklist) or 'none'})
+    _output = _template.substitute({'artist': artist or "none",
+                                    'album': title or 'none',
+                                    'genre': genre or 'none',
+                                    'style': style or 'none',
+                                    'bitrate': _bitrate or 'none',
+                                    'bitrate_literal': _bitrate_literal or 'none',
+                                    'tracklist': '\n'.join(_tracklist) or 'none'})
+
+with file(os.path.basename(os.path.normpath(folder) + '.nfo'), 'w') as _file:
+    _file.write(_output)
+
+logging.info('Wrote file "{0}" to working directory.'.format(os.path.basename(os.path.normpath(folder) + '.nfo')))
